@@ -1,0 +1,249 @@
+:root {
+  --accent: #b072ff;
+  --accent-2: #6ee7b7;
+  --text: #f2eefb;
+  --muted: #d8d2e6;
+  --spotify: #1db954;
+  --ytmusic: #ff0000;
+  --pill: rgba(30, 22, 40, 0.42);
+  --pill-border: rgba(255, 255, 255, 0.16);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--text);
+  background: #0b0912;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+/* Full-screen background photo. A fixed layer (not background-attachment:fixed,
+   which is broken/misaligned on mobile) so it fills the screen on every device. */
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: #0b0912 url("/static/background.jpg") center center / cover no-repeat;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  /* Gentle top + bottom shading so the top bar and pill stay readable. */
+  background: linear-gradient(180deg,
+    rgba(6,4,12,0.45) 0%,
+    rgba(6,4,12,0.05) 22%,
+    rgba(6,4,12,0.05) 62%,
+    rgba(6,4,12,0.55) 100%);
+}
+
+audio { display: none; }
+
+.app {
+  position: relative;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  /* Safe-area insets for notched phones */
+  padding:
+    calc(env(safe-area-inset-top) + 14px)
+    calc(env(safe-area-inset-right) + 14px)
+    calc(env(safe-area-inset-bottom) + 16px)
+    calc(env(safe-area-inset-left) + 14px);
+}
+
+/* ---- Top bar: brand • online • streaming links ---- */
+.topbar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand { display: flex; flex-direction: column; line-height: 1.1; }
+.brand-name { font-size: 18px; font-weight: 800; letter-spacing: 0.5px; text-shadow: 0 2px 10px rgba(0,0,0,0.6); }
+.brand-tag { font-size: 10px; color: var(--muted); letter-spacing: 0.6px; margin-top: 2px; text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
+
+.online {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;
+  color: var(--text);
+  font-size: 13px;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+}
+.online .dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--accent-2);
+  box-shadow: 0 0 10px var(--accent-2);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+.links { display: flex; align-items: center; gap: 16px; }
+.link {
+  display: inline-flex; align-items: center; gap: 5px;
+  text-decoration: none; color: var(--text);
+  font-size: 13px; font-weight: 600;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+  opacity: 0.95;
+}
+.link::before {
+  width: 20px; height: 20px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 12px; color: #fff;
+}
+.link.spotify::before { content: "♫"; background: var(--spotify); }
+.link.ytmusic::before { content: "▶"; background: var(--ytmusic); font-size: 10px; }
+.link::after { content: "↗"; font-size: 11px; opacity: 0.7; }
+
+/* ---- Big stylised Hindi title, centred on the page ---- */
+.hero {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 10px;
+  pointer-events: none;
+}
+.hero-title {
+  font-family: "Yatra One", "Rozha One", "Nirmala UI", "Kohinoor Devanagari", "Mangal", system-ui, sans-serif;
+  font-weight: 400;
+  font-size: clamp(64px, 22vw, 190px);
+  line-height: 1.05;
+  letter-spacing: 1px;
+  color: #fff;
+  text-align: center;
+  text-shadow:
+    0 2px 0 rgba(0,0,0,0.25),
+    0 8px 30px rgba(0,0,0,0.55),
+    0 0 60px rgba(176,114,255,0.25);
+}
+
+/* ---- Bottom pill player ---- */
+.bottom {
+  margin-top: auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.dock {
+  width: 100%;
+  max-width: 620px;
+  background: var(--pill);
+  border: 1px solid var(--pill-border);
+  border-radius: 999px;
+  padding: 10px 16px 10px 10px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  box-shadow: 0 16px 50px rgba(0,0,0,0.55);
+}
+
+/* Round album thumbnail on the left of the pill */
+.thumb {
+  flex: 0 0 auto;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  background: linear-gradient(135deg, #2a1f45 0%, #3a2560 50%, #1e1533 100%);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.12) inset;
+}
+.thumb.has-art { font-size: 0; }
+.thumb.playing { animation: spin 9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.meta { flex: 1 1 auto; min-width: 0; text-align: left; }
+.title {
+  font-size: 16px; font-weight: 700; line-height: 1.2;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+}
+.artist {
+  color: var(--muted); margin-top: 2px; font-size: 13px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.seek { display: flex; align-items: center; gap: 10px; margin-top: 7px; }
+.times { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 11px; flex: 0 0 auto; }
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  flex: 1;
+  height: 4px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.25);
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 13px; height: 13px; border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(0,0,0,0.4);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 13px; height: 13px; border: 0; border-radius: 50%;
+  background: #fff;
+}
+
+.controls { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+.controls button {
+  background: none; border: 0; color: var(--text);
+  font-size: 20px; cursor: pointer; opacity: 0.95;
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform 0.1s, opacity 0.15s;
+}
+.controls button:active { transform: scale(0.88); }
+.controls .play {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: #fff; color: #150c22;
+  font-size: 22px; box-shadow: 0 8px 22px rgba(0,0,0,0.4);
+}
+
+.hint { color: var(--text); font-size: 12px; text-align: center; opacity: 0.9;
+  min-height: 14px; text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
+
+/* ---- Mobile: stack controls under the meta so the pill isn't cramped ---- */
+@media (max-width: 560px) {
+  .dock {
+    border-radius: 28px;
+    padding: 12px 14px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .controls {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    gap: 28px;
+    margin-top: 2px;
+  }
+  .controls .play { width: 60px; height: 60px; font-size: 24px; }
+  .brand-tag { display: none; }
+}
+
+@media (min-width: 700px) {
+  .controls button:hover { opacity: 1; transform: scale(1.1); }
+  .link:hover { opacity: 1; }
+}
